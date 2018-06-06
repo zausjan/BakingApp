@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -48,13 +51,14 @@ import static com.jan.bakingapp.RecipeActivity.EXTRA_STEP;
 public class RecipeFragment extends Fragment implements ExoPlayer.EventListener{
 
     private final static String EXTRA_PLAYER_POSITION = "extra_position";
+    private static final String EXTRA_PLAYER_STATE = "extra_player_state";
+
     private SimpleExoPlayer exoPlayer;
     @BindView(R.id.player_view)  SimpleExoPlayerView exoPlayerView;
     @BindView(R.id.tv_instruction)  TextView instructionsTv;
     private Unbinder unbinder;
     public RecipeFragment() {
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,13 +70,13 @@ public class RecipeFragment extends Fragment implements ExoPlayer.EventListener{
         Step step = args.getParcelable(EXTRA_STEP);
         instructionsTv.setText(step.getDescription());
 
-
-
         Uri videoURI = Uri.parse(step.getVideoURL());
         initializePlayer(videoURI);
         if(savedInstanceState != null){
             long playerPosition = savedInstanceState.getLong(EXTRA_PLAYER_POSITION);
             exoPlayer.seekTo(playerPosition);
+            boolean isPlayWhenReady = savedInstanceState.getBoolean(EXTRA_PLAYER_STATE);
+            exoPlayer.setPlayWhenReady(isPlayWhenReady);
         }
 
         exoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getResources(),
@@ -82,6 +86,7 @@ public class RecipeFragment extends Fragment implements ExoPlayer.EventListener{
 
         return rootView;
     }
+
 
     @Override
     public void onDestroyView() {
@@ -94,6 +99,8 @@ public class RecipeFragment extends Fragment implements ExoPlayer.EventListener{
         super.onSaveInstanceState(outState);
         long position = exoPlayer.getCurrentPosition();
         outState.putLong(EXTRA_PLAYER_POSITION, position);
+        boolean isPlayWhenReady = exoPlayer.getPlayWhenReady();
+        outState.putBoolean(EXTRA_PLAYER_STATE, isPlayWhenReady);
     }
 
 
@@ -106,7 +113,6 @@ public class RecipeFragment extends Fragment implements ExoPlayer.EventListener{
     @Override
     public void onResume() {
         super.onResume();
-        startPlayer();
     }
 
     private void initializePlayer(Uri mediaUri){
@@ -143,6 +149,7 @@ public class RecipeFragment extends Fragment implements ExoPlayer.EventListener{
             params.width = ViewGroup.LayoutParams.MATCH_PARENT;
             params.height = ViewGroup.LayoutParams.MATCH_PARENT;
             exoPlayerView.setLayoutParams(params);
+
             if (getActivity().getActionBar() != null) {
                 getActivity().getActionBar().hide();
             }

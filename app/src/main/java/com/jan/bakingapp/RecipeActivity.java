@@ -7,16 +7,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.jan.bakingapp.model.Recipe;
 
-public class RecipeActivity extends FragmentActivity implements ViewPager.OnPageChangeListener {
+public class RecipeActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
     final static String EXTRA_POSITION = "extra_position";
     final static String EXTRA_STEP = "extra_step";
@@ -34,6 +37,11 @@ public class RecipeActivity extends FragmentActivity implements ViewPager.OnPage
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
 
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         Intent intent = getIntent();
         if(intent == null){
             return;
@@ -43,9 +51,8 @@ public class RecipeActivity extends FragmentActivity implements ViewPager.OnPage
         if(recipe == null){
             return;
         }
-
+        setTitle(recipe.getName());
         int position = intent.getIntExtra(EXTRA_POSITION, 0);
-
 
         pager_indicator = findViewById(R.id.viewPagerCountDots);
         ViewPager pager = findViewById(R.id.pager);
@@ -55,6 +62,14 @@ public class RecipeActivity extends FragmentActivity implements ViewPager.OnPage
         pager.addOnPageChangeListener(this);
         setUiPageViewController();
         pager.setCurrentItem(position);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
     }
 
     @Override

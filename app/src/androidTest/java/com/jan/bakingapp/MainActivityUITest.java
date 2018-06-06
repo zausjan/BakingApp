@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -38,12 +37,9 @@ public class MainActivityUITest {
 
 
     @Test
-    public void verifyData() {
-        onView(withId(R.id.recipes_rv)).perform(click());
-        onView(withText("Nutella Pie")).check(matches(isDisplayed()));
-        onView(withText("Brownies")).check(matches(isDisplayed()));
-        onView(withText("Yellow Cake")).check(matches(isDisplayed()));
-        onView(withText("Cheesecake")).check(matches(isDisplayed()));
+    public void verifyTitle() {
+        String title = activityTestRule.getActivity().getString(R.string.app_name);
+        onView(withText(title)).check(matches(isDisplayed()));
     }
 
 
